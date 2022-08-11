@@ -7,6 +7,8 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:http/http.dart' as http;
 import 'package:pokedex_flutter_app/pokedex.dart';
 
+import 'detail_screen.dart';
+
 class PokedexListScreen extends StatefulWidget {
   const PokedexListScreen({Key? key}) : super(key: key);
 
@@ -52,11 +54,9 @@ class _PokedexListScreenState extends State<PokedexListScreen> {
                       children: List.generate(
                           pokemon.length,
                           (index) => _buildCardElementGrid(
-                              getColorFromType(pokemon![index].type![0]),
-                              pokemon![index].name!,
-                              pokemon[index].img!,
-                              pokemon[index].type!,
-                              Container())))
+                              getColorFromType(pokemon[index].type![0]),
+                              pokemon[index],
+                              index)))
                 ]));
               } else {
                 return Center(
@@ -94,13 +94,54 @@ class _PokedexListScreenState extends State<PokedexListScreen> {
                                                     : Colors.pink;
   }
 
-  Widget _buildCardElementGrid(Color color, String name, String imageUrl,
-      List<String> types, Widget function) {
+  Widget _buildCardElementGrid(Color color, Pokemon pokemon, int index) {
     return Padding(
         padding: EdgeInsets.only(left: 4, right: 4, bottom: 10, top: 10),
         child: GestureDetector(
-            onTap: (() => Navigator.push(
-                context, MaterialPageRoute(builder: (context) => function))),
+            onTap: (() {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => DetailScreen(
+                            heroTag: index,
+                            pokemonDetail: pokemon,
+                            color: pokemon.type![0] == "Grass"
+                                ? Colors.greenAccent
+                                : pokemon.type![0] == "Fire"
+                                    ? Colors.redAccent
+                                    : pokemon.type![0] == "Water"
+                                        ? Colors.blue
+                                        : pokemon.type![0] == "Poison"
+                                            ? Colors.deepPurpleAccent
+                                            : pokemon.type![0] == "Electric"
+                                                ? Colors.amber
+                                                : pokemon.type![0] == "Rock"
+                                                    ? Colors.grey
+                                                    : pokemon.type![0] ==
+                                                            "Ground"
+                                                        ? Colors.brown
+                                                        : pokemon.type![0] ==
+                                                                "Psychic"
+                                                            ? Colors.indigo
+                                                            : pokemon.type![
+                                                                        0] ==
+                                                                    "Fighting"
+                                                                ? Colors.orange
+                                                                : pokemon.type![
+                                                                            0] ==
+                                                                        "Bug"
+                                                                    ? Colors
+                                                                        .lightGreenAccent
+                                                                    : pokemon.type![0] ==
+                                                                            "Ghost"
+                                                                        ? Colors
+                                                                            .deepPurple
+                                                                        : pokemon.type![0] ==
+                                                                                "Normal"
+                                                                            ? Colors.white70
+                                                                            : Colors.pink,
+                          )));
+            }),
             child: Container(
               height: 10,
               child: Stack(
@@ -112,19 +153,35 @@ class _PokedexListScreenState extends State<PokedexListScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          children: buildTypesColumn(name, types),
+                          children:
+                              buildTypesColumn(pokemon.name!, pokemon.type!),
                         )),
                   ),
                   Positioned(
                       top: 10,
                       left: 80,
                       child: CachedNetworkImage(
-                          imageUrl: imageUrl,
+                          imageUrl:
+                              "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${index + 1}.png",
                           height: 100,
                           fit: BoxFit.fitHeight,
                           placeholder: (context, url) => Center(
                                 child: CircularProgressIndicator(),
                               ))),
+                  Positioned(
+                      top: 10,
+                      left: 70,
+                      child: Container(
+                        height: 120,
+                        width: 120,
+                        decoration: BoxDecoration(
+                            image: DecorationImage(
+                                image: AssetImage('pokewhite.png'),
+                                colorFilter: ColorFilter.mode(
+                                  Colors.white.withOpacity(0.2),
+                                  BlendMode.modulate,
+                                ))),
+                      )),
                 ],
               ),
               decoration: BoxDecoration(boxShadow: [
